@@ -1,6 +1,6 @@
 import gzip
 
-def init_transcript_reference(file_path):
+def read_transcript_references(file_path):
     transcript_reference = {}
     with gzip.open(file_path, 'rt') as file:  # 'rt' mode to read as text
         name = None
@@ -17,3 +17,21 @@ def init_transcript_reference(file_path):
         if name:  # Save the last sequence
             transcript_reference[name] = ''.join(seq_list)
     return transcript_reference
+
+class Writer:
+
+    def __init__(self, transcript, file_dir):
+        self.file_path = f'{file_dir}/{transcript}.fa.gz'
+        self.file = gzip.open(self.file_path, 'w')
+
+    def write_header(self, individuals):
+        if (type(individuals) == str) or len(individuals) == 1:
+            self.file.write(f'>{individuals}\n'.encode())
+        elif type(individuals) == list and len(individuals) > 1:
+            self.file.write(f'>{",".join(individuals)}\n'.encode())
+    
+    def write_sequence(self, sequence):
+        self.file.write(f'{sequence}\n'.encode())
+
+    def close(self):
+        self.file.close()
