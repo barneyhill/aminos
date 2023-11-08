@@ -74,6 +74,12 @@ class Instructions:
                 continue
 
     def test_position_uniqueness(self, instructions):
+
+        positions = [instruction[1] for instruction in instructions]
+
+        if len(positions) > len(set(positions)):
+            return False
+
         return True
 
     def test_isolated_boundaries(self, instructions):
