@@ -22,7 +22,7 @@ csq_examples = {
 
 class TestCsqProcessing(unittest.TestCase):
 
-    def test_mutations(self):
+    def test_bsqs(self):
         for mutation_type, example in csq_examples.items():
             with self.subTest(mutation_type=mutation_type):
                 actual_mutation = aminos.processing.csq.process_csq(example['expected_transcript'], example['bsq'])
