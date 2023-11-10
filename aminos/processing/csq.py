@@ -1,28 +1,9 @@
+from aminos.processing.mutations import Mutation
+
 mutation_dict = {
-    "*frameshift": "R",
-    "*frameshift&stop_retained": "Q",
-    "*inframe_deletion": "C",
-    "*inframe_insertion": "J",
-    "*missense": "N",
-    "*missense&inframe_altering": "K",
-    "*stop_gained": "X",
-    "*stop_gained&inframe_altering": "A",
-    "frameshift": "F",
-    "frameshift&start_lost": "V",
-    "frameshift&stop_retained": "B",
     "inframe_deletion": "D",
-    "inframe_deletion&stop_retained": "P",
     "inframe_insertion": "I",
-    "inframe_insertion&stop_retained": "Z",
     "missense": "M",
-    "missense&inframe_altering": "Y",
-    "phi": "E",
-    "start_lost": "0",
-    "start_lost&splice_region": "U",
-    "stop_gained": "G",
-    "stop_gained&inframe_altering": "T",
-    "stop_lost": "L",
-    "stop_lost&frameshift": "W"
 }
 
 def parse_amino_acid_seq_position(input_seq):
@@ -59,22 +40,22 @@ def parse_amino_acid_field(input_string):
 
 # take a bcftools csq string and return the transcript and instruction
 # an instruction is defined as:
-# (mutation_code, ref_pos, alt_pos, alt_seq, ref_seq_len)
+# (mutation_code, ref_pos, ref_seq, mut_pos, mut_seq)
 
-def process_csq(csq):
+def process_csq(transcript_id, csq):
     csq = csq.split('|')
 
-    mutation_type = csq[0]
-    if mutation_type not in mutation_dict:
-        return None, None
-    
     if len(csq) != 7:
-        return None, None
+        return None
 
-    code = mutation_dict[mutation_type]
+    if transcript_id != csq[2]:
+        return None
 
-    transcript = csq[2]
+    mutation_type = csq[0]
 
+    if mutation_type not in mutation_dict:
+        return None
+    
     ref_pos, ref_seq, mut_pos, mut_seq = parse_amino_acid_field(csq[5])
     
-    return transcript, (code, ref_pos, mut_pos, mut_seq, len(ref_seq))
+    return Mutation(mut_code=mutation_type, ref_pos=ref_pos, ref_seq=ref_seq, alt_pos=mut_pos, alt_seq=mut_seq)

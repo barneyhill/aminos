@@ -4,22 +4,23 @@
 
 ## Overview
 
-Convert large genetic VCF files into FASTA files corresponding to individual's protein sequences. This repo can handle complex combinations of coding variants and implements the  sequence intermediate representation (SIR) algorithm from VCF2Prot ([paper](https://www.biorxiv.org/content/10.1101/2022.01.21.477084v1.full.pdf), [code](https://github.com/ikmb/vcf2prot)) to enable biobank-scale mapping.
+Convert large genetic VCF files into FASTA files corresponding to individual's protein sequences. This repo will handle complex combinations of coding variants scaling to biobank-size genetic sequencing datasets.
 
-## Currently supported variants
+## Install
 
-- frameshift
-- frameshift&start_lost
-- frameshift&stop_retained
-- inframe_deletion
-- inframe_deletion&stop_retained
-- inframe_insertion
-- inframe_insertion&stop_retained
+```
+git clone https://github.com/barneyhill/aminos
+cd aminos
+pip install -r requirements.txt
+```
+
+## Usage
+```
+python3 aminos.py --vcf [path-to-vcf] --gff [path-to-gff] --fasta [path-to-fasta] --output [output-directory]
+```
+
+## Initially supported consequences
+
 - missense
-- missense&inframe_altering
-- start_lost
-- start_lost&splice_region
-- stop_gained
-- stop_gained&inframe_altering
-- stop_lost
-- stop_lost&frameshift
+- inframe_deletion
+- inframe_insertion

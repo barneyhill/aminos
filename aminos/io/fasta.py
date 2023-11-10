@@ -1,4 +1,5 @@
 import gzip
+import os
 
 def read_transcript_references(file_path):
     transcript_reference = {}
@@ -20,8 +21,8 @@ def read_transcript_references(file_path):
 
 class Writer:
 
-    def __init__(self, transcript, file_dir):
-        self.file_path = f'{file_dir}/{transcript}.fa.gz'
+    def __init__(self, file_dir, transcript):
+        self.file_path = os.path.join(file_dir, f'{transcript}.fa.gz')
         self.file = gzip.open(self.file_path, 'w')
 
     def write_header(self, individuals):
