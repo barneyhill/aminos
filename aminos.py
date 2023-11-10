@@ -1,6 +1,7 @@
 import argparse
 import logging
 import aminos
+from collections import Counter
 
 def main():
     parser = argparse.ArgumentParser(description="Aminos Genetic Data Processing")
@@ -10,6 +11,9 @@ def main():
     parser.add_argument('--output', help='Output directory', required=True)
 
     args = parser.parse_args()
+
+    total_mutations = 0
+    accepted_mutations = Counter()
 
     # Configure logging
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -21,6 +25,7 @@ def main():
     gff_transcripts = gff.get_unique_transcripts()
 
     for transcript_id in gff_transcripts:
+        
         if transcript_id not in transcript_references:
             continue
         else:
@@ -58,6 +63,12 @@ def main():
                 file.write_sequence(seq)
 
         file.close()
+
+        total_mutations += mutations.total_mutations
+        accepted_mutations += mutations.accepted_mutations
+
+    logging.info(f"Accepted mutations total: {sum(accepted_mutations.values())} ({sum(accepted_mutations.values())/total_mutations:.2f}% accepted)")
+    logging.info(f"Accepted mutations by type: {accepted_mutations}")
 
 # example:
 # python3 aminos.py --vcf data/ALL_GGVP.chr21.vcf.gz --gff data/Homo_sapiens.GRCh38.110.chromosome.21.gff3.gz --fasta data/reference_sequences.fasta.gz --output data/test

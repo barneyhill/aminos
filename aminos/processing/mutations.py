@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import defaultdict, Counter
 from dataclasses import dataclass
 import logging
 
@@ -22,6 +22,8 @@ class Mutations:
         self._id_to_mutation = {}
         self.mutation_ids = defaultdict(set)
         self.transcript_reference = transcript_reference
+        self.total_mutations = 0
+        self.accepted_mutations = Counter()
 
     def _get_mutation_id(self, mutation):
         mutation_key = str(mutation)
@@ -45,9 +47,14 @@ class Mutations:
         return [ self._get_id_to_mutation(id) for id in self.mutation_ids[sample] ] 
         
     def concat_mutations(self, sample):
+
         transcript_seq = list(self.transcript_reference)
 
-        for mutation in sorted(self.get_sample_mutations(sample), key=lambda mut: mut.ref_pos):
+        sample_mutations = self.get_sample_mutations(sample)
+
+        self.total_mutations += len(sample_mutations)
+
+        for mutation in sorted(sample_mutations, key=lambda mut: mut.ref_pos):
             logging.info(f"Applying mutation: {mutation}")
 
             if not self._is_valid_mutation(mutation, transcript_seq):
@@ -57,6 +64,8 @@ class Mutations:
             for i, ref_char in enumerate(mutation.ref_seq):
                 transcript_seq[mutation.ref_pos - 1 + i] = ''  # Remove ref_seq characters
             transcript_seq[mutation.ref_pos - 1] = mutation.alt_seq  # Insert alt_seq
+
+            self.accepted_mutations[mutation.mut_code] += 1
 
         return ''.join(transcript_seq)
 
