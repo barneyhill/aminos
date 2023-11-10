@@ -55,7 +55,7 @@ class Mutations:
         self.total_mutations += len(sample_mutations)
 
         for mutation in sorted(sample_mutations, key=lambda mut: mut.ref_pos):
-            logging.info(f"Applying mutation: {mutation}")
+            logging.debug(f"Applying mutation: {mutation}")
 
             if not self._is_valid_mutation(mutation, transcript_seq):
                 return ''.join(transcript_seq)  # Early return with the original sequence
@@ -75,16 +75,16 @@ class Mutations:
 
             # Out-of-bounds check:
             if pos >= len(transcript_seq):
-                logging.warning(f"Mutation at position {pos + 1} is out of bounds!")
+                logging.debug(f"Mutation at position {pos + 1} is out of bounds!")
                 return False
 
             # Mismatch check:
             if transcript_seq[pos] != ref_char:
-                logging.warning(f"Reference {mutation.ref_pos + i}{ref_char} does not match transcript reference {pos + 1}{transcript_seq[pos]}")
+                logging.debug(f"Reference {mutation.ref_pos + i}{ref_char} does not match transcript reference {pos + 1}{transcript_seq[pos]}")
                 return False
             
             # Overlap check
             if transcript_seq[pos] == '':
-                logging.warning(f"Conflict! Mutation at position {pos + 1} has already been touched!")
+                logging.debug(f"Conflict! Mutation at position {pos + 1} has already been touched!")
                 return False
         return True

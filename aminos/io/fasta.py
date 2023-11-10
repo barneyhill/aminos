@@ -3,7 +3,7 @@ import os
 import logging
 
 def read_transcript_references(file_path):
-    logging.info(f"Reading transcript references from: {file_path}")
+    logging.debug(f"Reading transcript references from: {file_path}")
     transcript_reference = {}
     try:
         with gzip.open(file_path, 'rt') as file:  # 'rt' mode to read as text
@@ -20,6 +20,8 @@ def read_transcript_references(file_path):
                     seq_list.append(line)
             if name:  # Save the last sequence
                 transcript_reference[name] = ''.join(seq_list)
+
+        logging.info(f"Successfully read {len(transcript_reference)} transcript references")
     except Exception as e:
         logging.error(f"Error in reading transcript references: {e}")
         raise
@@ -31,7 +33,7 @@ class Writer:
         self.file_path = os.path.join(file_dir, f'{transcript}.fa.gz')
         try:
             self.file = gzip.open(self.file_path, 'w')
-            logging.info(f"Initialized Writer for file: {self.file_path}")
+            logging.debug(f"Initialized Writer for file: {self.file_path}")
         except Exception as e:
             logging.error(f"Error opening file for writing: {e}")
             raise

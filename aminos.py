@@ -2,13 +2,15 @@ import argparse
 import logging
 import aminos
 from collections import Counter
+import tqdm
 
 def main():
-    parser = argparse.ArgumentParser(description="Aminos Genetic Data Processing")
+    parser = argparse.ArgumentParser(description="aminos")
     parser.add_argument('--vcf', help='Path to VCF file', required=True)
     parser.add_argument('--gff', help='Path to GFF file', required=True)
     parser.add_argument('--fasta', help='Path to FASTA file', required=True)
     parser.add_argument('--output', help='Output directory', required=True)
+    parser.add_argument('--debug', help='Enable debug mode', action='store_true', default=False)
 
     args = parser.parse_args()
 
@@ -16,25 +18,30 @@ def main():
     accepted_mutations = Counter()
 
     # Configure logging
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    if args.debug:
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+    else:
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
     vcf = aminos.io.VCF(args.vcf)
     gff = aminos.io.GFF(args.gff)
     transcript_references = aminos.io.fasta.read_transcript_references(args.fasta)
 
     gff_transcripts = gff.get_unique_transcripts()
+    total_transcripts_seen = 0
 
-    for transcript_id in gff_transcripts:
+    for transcript_id in tqdm.tqdm(gff_transcripts, desc="Iterating over transcripts"):
         
         if transcript_id not in transcript_references:
             continue
         else:
             transcript_reference = transcript_references[transcript_id]
+            total_transcripts_seen += 1
 
         mutations = aminos.processing.mutations.Mutations(transcript_reference)
         chr, start, end = gff.get_transcript_range(transcript_id)
 
-        logging.info(f"Processing transcript: {transcript_id} ({chr}:{start}-{end})")
+        logging.debug(f"Processing transcript: {transcript_id} ({chr}:{start}-{end})")
 
         for record in vcf(f'{chr}:{start}-{end}'):
             bcsq = record.INFO.get('BCSQ')
@@ -67,8 +74,9 @@ def main():
         total_mutations += mutations.total_mutations
         accepted_mutations += mutations.accepted_mutations
 
-    logging.info(f"Accepted mutations total: {sum(accepted_mutations.values())} ({sum(accepted_mutations.values())/total_mutations:.2f}% accepted)")
+    logging.info(f"Accepted mutations total: {sum(accepted_mutations.values())} ({100 * sum(accepted_mutations.values())/total_mutations:.2f}% accepted)")
     logging.info(f"Accepted mutations by type: {accepted_mutations}")
+    logging.info(f"Total transcripts seen: {total_transcripts_seen}")
 
 # example:
 # python3 aminos.py --vcf data/ALL_GGVP.chr21.vcf.gz --gff data/Homo_sapiens.GRCh38.110.chromosome.21.gff3.gz --fasta data/reference_sequences.fasta.gz --output data/test

@@ -3,12 +3,12 @@ import logging
 
 class GFF:
     def __init__(self, file):
-        logging.info(f"Initializing GFF with file: {file}")
+        logging.debug(f"Initializing GFF with file: {file}")
         self.gff = self.read_gff(file)
 
     @staticmethod
     def read_gff(file):
-        logging.info(f"Reading GFF file: {file}")
+        logging.debug(f"Reading GFF file: {file}")
         field_names = [
             'seqid', 'source', 'type', 'start', 'end', 'score', 
             'strand', 'phase', 'attributes'
@@ -17,7 +17,7 @@ class GFF:
             gff = pd.read_csv(file, sep='\t', comment='#', names=field_names)
             gff['ID'] = gff['attributes'].str.extract(r'ID=transcript:([^;]+)')
             gff = gff[gff['ID'].notna()]
-            logging.info("Successfully read and processed GFF file")
+            logging.info(f"Successfully read and processed {file}")
             return gff
         except Exception as e:
             logging.error(f"Error in reading GFF file: {e}")
@@ -27,7 +27,7 @@ class GFF:
         transcript = self.gff[self.gff['ID'] == transcript_id]
 
         if transcript.empty:
-            logging.warning(f"No transcript found for ID: {transcript_id}")
+            logging.debug(f"No transcript found for ID: {transcript_id}")
             return None, None, None
         
         if transcript.shape[0] > 1:
@@ -42,5 +42,5 @@ class GFF:
 
     def get_unique_transcripts(self):
         unique_transcripts = self.gff['ID'].unique()
-        logging.info(f"Number of unique transcripts: {len(unique_transcripts)}")
+        logging.debug(f"Number of unique transcripts: {len(unique_transcripts)}")
         return unique_transcripts
