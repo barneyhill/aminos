@@ -43,33 +43,28 @@ class Mutations:
 
     def get_sample_mutations(self, sample):
         return [ self._get_id_to_mutation(id) for id in self.mutation_ids[sample] ] 
-    
+        
     def concat_mutations(self, sample):
-
         transcript_seq = list(self.transcript_reference)
-        touched = len(transcript_seq) * [False]
-
-        # sort mutations by ref_pos:
 
         for mutation in sorted(self.get_sample_mutations(sample), key=lambda mut: mut.ref_pos):
+            if not self._is_valid_mutation(mutation, transcript_seq):
+                return ''.join(transcript_seq)  # Early return with the original sequence
 
-            # all pos numbers are 1-based!
-
-            for pos in range(mutation.ref_pos, mutation.ref_pos + len(mutation.ref_seq)):
-
-                if touched[pos - 1]:
-                    logging.warning(f"Conflict! Mutation at position {pos} has already been touched!")
-
-                    return ''.join(transcript_seq)
-                
-                # check the ref seq matches the transcript seq
-                if transcript_seq[pos - 1] != mutation.ref_seq[pos - mutation.ref_pos]:
-                    logging.warning(f"Reference {mutation.ref_pos}{mutation.ref_seq[pos - mutation.ref_pos]} does not match transcript reference {pos}{transcript_seq[pos - 1]}")
-                    continue
-
-                transcript_seq[pos - 1] = ''
-                touched[pos - 1] = True
-
-            transcript_seq[pos - 1] = mutation.alt_seq
+            # Apply the mutation
+            for i, ref_char in enumerate(mutation.ref_seq):
+                transcript_seq[mutation.ref_pos - 1 + i] = ''  # Remove ref_seq characters
+            transcript_seq[mutation.ref_pos - 1] = mutation.alt_seq  # Insert alt_seq
 
         return ''.join(transcript_seq)
+
+    def _is_valid_mutation(self, mutation, transcript_seq):
+        for i, ref_char in enumerate(mutation.ref_seq):
+            pos = mutation.ref_pos - 1 + i
+            if transcript_seq[pos] != ref_char:  # Mismatch check
+                logging.warning(f"Reference {mutation.ref_pos + i}{ref_char} does not match transcript reference {pos + 1}{transcript_seq[pos]}")
+                return False
+            if transcript_seq[pos] == '':  # Overlap check
+                logging.warning(f"Conflict! Mutation at position {pos + 1} has already been touched!")
+                return False
+        return True
