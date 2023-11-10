@@ -32,32 +32,31 @@ class Writer:
     def __init__(self, file_dir, transcript):
         self.file_path = os.path.join(file_dir, f'{transcript}.fa.gz')
         try:
-            self.file = gzip.open(self.file_path, 'w')
+            self.file = gzip.open(self.file_path, 'w', compresslevel=6)
             logging.debug(f"Initialized Writer for file: {self.file_path}")
         except Exception as e:
             logging.error(f"Error opening file for writing: {e}")
             raise
+        self.buffer = bytearray()
 
-    def write_header(self, individuals):
+    def write_header(self, individual):
         try:
-            if (type(individuals) == str) or len(individuals) == 1:
-                self.file.write(f'>{individuals}\n'.encode())
-            elif type(individuals) == list and len(individuals) > 1:
-                self.file.write(f'>{",".join(individuals)}\n'.encode())
+            self.buffer.extend(f'>{individual}\n'.encode())
         except Exception as e:
             logging.error(f"Error writing header: {e}")
             raise
     
     def write_sequence(self, sequence):
         try:
-            self.file.write(f'{sequence}\n'.encode())
+            self.buffer.extend(f'{sequence}\n'.encode())
         except Exception as e:
             logging.error(f"Error writing sequence: {e}")
             raise
 
+    def flush_buffer(self):
+        self.file.write(self.buffer)
+        self.buffer = []
+
     def close(self):
-        try:
-            self.file.close()
-        except Exception as e:
-            logging.error(f"Error closing file: {e}")
-            raise
+        self.flush_buffer()
+        self.file.close()
