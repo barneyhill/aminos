@@ -30,6 +30,8 @@ def main():
             mutations = aminos.processing.mutations.Mutations(transcript_reference)
             chr, start, end = gff.get_transcript_range(transcript_id)
 
+            logging.info(f"Processing transcript: {transcript_id} ({chr}:{start}-{end})")
+
             for record in vcf(f'{chr}:{start}-{end}'):
                 bcsq = record.INFO.get('BCSQ')
                 if bcsq is None:

@@ -17,14 +17,13 @@ class GFF:
             gff = pd.read_csv(file, sep='\t', comment='#', names=field_names)
             gff['ID'] = gff['attributes'].str.extract(r'ID=transcript:([^;]+)')
             gff = gff[gff['ID'].notna()]
-            logger.info("Successfully read and processed GFF file")
+            logging.info("Successfully read and processed GFF file")
             return gff
         except Exception as e:
-            logger.error(f"Error in reading GFF file: {e}")
+            logging.error(f"Error in reading GFF file: {e}")
             raise
 
     def get_transcript_range(self, transcript_id):
-        logging.info(f"Getting transcript range for ID: {transcript_id}")
         transcript = self.gff[self.gff['ID'] == transcript_id]
 
         if transcript.empty:
