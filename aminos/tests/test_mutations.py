@@ -21,3 +21,8 @@ class TestConcatMutations(unittest.TestCase):
         self.mutations.add_sample_mutation("sample4", Mutation("M", 6, "T", 6, "G"))
         # Expecting warning and unchanged sequence due to mismatch
         self.assertEqual(self.mutations.concat_mutations("sample4"), self.transcript_reference)
+
+    def test_out_of_bounds(self):
+        self.mutations.add_sample_mutation("sample5", Mutation("M", 13, "T", 13, "GG"))
+        # Expecting warning and unchanged sequence due to out-of-bounds
+        self.assertEqual(self.mutations.concat_mutations("sample5"), self.transcript_reference)
