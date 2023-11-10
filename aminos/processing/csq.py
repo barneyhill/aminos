@@ -55,7 +55,9 @@ def process_csq(transcript_id, csq):
 
     if mutation_type not in mutation_dict:
         return None
+
+    mutation_code = mutation_dict[mutation_type]
     
     ref_pos, ref_seq, mut_pos, mut_seq = parse_amino_acid_field(csq[5])
     
-    return Mutation(mut_code=mutation_type, ref_pos=ref_pos, ref_seq=ref_seq, alt_pos=mut_pos, alt_seq=mut_seq)
+    return Mutation(mut_code=mutation_code, ref_pos=ref_pos, ref_seq=ref_seq, alt_pos=mut_pos, alt_seq=mut_seq)
