@@ -63,7 +63,6 @@ def run(args):
         if mutations.accepted_mutations == 0:
             continue
 
-
         file = aminos.io.fasta.Writer(args.output, transcript_id)
 
         file.write(mutations)
