@@ -22,8 +22,7 @@ class Mutations:
         self._id_to_mutation = {}
         self.mutation_ids = defaultdict(set)
         self.transcript_reference = transcript_reference
-        self.total_mutations = 0
-        self.accepted_mutations = Counter()
+        self.accepted_mutations = 0
 
         self._mutation_ids_to_sequence = {}  # Cache to store mutation sequence results
         self._mutation_ids_to_samples = defaultdict(set)
@@ -63,6 +62,7 @@ class Mutations:
         if mutation_ids in self._mutation_ids_to_sequence:
             # Append the sample to the list of associated samples
             self._mutation_ids_to_samples[mutation_ids].add(sample)
+            self.accepted_mutations += len(mutation_ids)
             return
 
         transcript_seq = list(self.transcript_reference)
@@ -78,12 +78,12 @@ class Mutations:
                 transcript_seq[mutation.ref_pos - 1 + i] = ''  # Remove ref_seq characters
             transcript_seq[mutation.ref_pos - 1] = mutation.alt_seq  # Insert alt_seq
 
-            self.accepted_mutations[mutation.mut_code] += 1
-
         # Concatenate the sequence and update the cache
         result_sequence = ''.join(transcript_seq)
         self._mutation_ids_to_sequence[mutation_ids] = result_sequence
         self._mutation_ids_to_samples[mutation_ids].add(sample)
+
+        self.accepted_mutations += len(mutation_ids)
 
     def _is_valid_mutation(self, mutation, transcript_seq):
         for i, ref_char in enumerate(mutation.ref_seq):
