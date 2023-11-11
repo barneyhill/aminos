@@ -19,7 +19,6 @@ csq_examples = {
     },
 }
 
-
 class TestCsqProcessing(unittest.TestCase):
 
     def test_bsqs(self):
@@ -27,3 +26,16 @@ class TestCsqProcessing(unittest.TestCase):
             with self.subTest(mutation_type=mutation_type):
                 actual_mutation = aminos.processing.csq.process_csq(example['expected_transcript'], example['bsq'])
                 self.assertEqual(actual_mutation, example['expected_mutation'])
+
+    def test_parse_amino_acid_seq_position(self):
+        self.assertEqual(aminos.processing.csq.parse_amino_acid_seq_position('123ABC'), (123, 'ABC'))
+        self.assertEqual(aminos.processing.csq.parse_amino_acid_seq_position('456'), (456, '*'))
+        with self.assertRaises(ValueError):
+            aminos.processing.csq.parse_amino_acid_seq_position('ABC')
+
+    def test_parse_amino_acid_field(self):
+        self.assertEqual(aminos.processing.csq.parse_amino_acid_field('123ABC>456DEF'), (123, 'ABC', 456, 'DEF'))
+        with self.assertRaises(ValueError):
+            aminos.processing.csq.parse_amino_acid_field('123ABC')
+        with self.assertRaises(ValueError):
+            aminos.processing.csq.parse_amino_acid_field('123ABC>456DEF>789GHI')
