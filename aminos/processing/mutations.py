@@ -25,6 +25,15 @@ class Mutations:
         self.total_mutations = 0
         self.accepted_mutations = Counter()
 
+        self._mutation_ids_to_sequence = {}  # Cache to store mutation sequence results
+        self._mutation_ids_to_samples = defaultdict(set)
+
+    def get_mutation_ids_to_sequence(self):
+        return self._mutation_ids_to_sequence
+    
+    def get_mutation_ids_to_samples(self):
+        return self._mutation_ids_to_samples
+
     def _get_mutation_id(self, mutation):
         mutation_key = str(mutation)
         if mutation_key not in self._mutation_to_id:
@@ -47,27 +56,34 @@ class Mutations:
         return [ self._get_id_to_mutation(id) for id in self.mutation_ids[sample] ] 
         
     def concat_mutations(self, sample):
+        # Generate a cache key (sorted tuple of mutation IDs)
+        mutation_ids = tuple(sorted(self.mutation_ids[sample]))
+
+        # Check if the result is already in the cache
+        if mutation_ids in self._mutation_ids_to_sequence:
+            # Append the sample to the list of associated samples
+            self._mutation_ids_to_samples[mutation_ids].add(sample)
+            return
 
         transcript_seq = list(self.transcript_reference)
-
         sample_mutations = self.get_sample_mutations(sample)
 
-        self.total_mutations += len(sample_mutations)
-
+        # Apply sorted mutations
         for mutation in sorted(sample_mutations, key=lambda mut: mut.ref_pos):
-            logging.debug(f"Applying mutation: {mutation}")
-
             if not self._is_valid_mutation(mutation, transcript_seq):
-                return ''.join(transcript_seq)  # Early return with the original sequence
+                return
 
             # Apply the mutation
-            for i, ref_char in enumerate(mutation.ref_seq):
+            for i, _ in enumerate(mutation.ref_seq):
                 transcript_seq[mutation.ref_pos - 1 + i] = ''  # Remove ref_seq characters
             transcript_seq[mutation.ref_pos - 1] = mutation.alt_seq  # Insert alt_seq
 
             self.accepted_mutations[mutation.mut_code] += 1
 
-        return ''.join(transcript_seq)
+        # Concatenate the sequence and update the cache
+        result_sequence = ''.join(transcript_seq)
+        self._mutation_ids_to_sequence[mutation_ids] = result_sequence
+        self._mutation_ids_to_samples[mutation_ids].add(sample)
 
     def _is_valid_mutation(self, mutation, transcript_seq):
         for i, ref_char in enumerate(mutation.ref_seq):

@@ -53,9 +53,17 @@ class Writer:
             logging.error(f"Error writing sequence: {e}")
             raise
 
+    def write(self, mutations_store):
+        ids_to_sequence = mutations_store.get_mutation_ids_to_sequence()
+
+        for mutations, samples in mutations_store.get_mutation_ids_to_samples().items():
+            self.write_header(','.join(samples))
+            self.write_sequence(ids_to_sequence[mutations])
+        self.flush_buffer()
+
     def flush_buffer(self):
         self.file.write(self.buffer)
-        self.buffer = []
+        self.buffer = bytearray()
 
     def close(self):
         self.flush_buffer()

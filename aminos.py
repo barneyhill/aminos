@@ -4,6 +4,9 @@ import aminos
 from collections import Counter
 import tqdm
 
+import cProfile
+import pstats
+
 def main():
     parser = argparse.ArgumentParser(description="aminos")
     parser.add_argument('--vcf', help='Path to VCF file', required=True)
@@ -59,27 +62,30 @@ def main():
                         if individual_call[haplotype] == 1:
                             mutations.add_sample_mutation(f'{individual}_{haplotype}', mutation)
 
-        file = aminos.io.fasta.Writer(args.output, transcript_id)
-
         for individual in vcf.samples:
             for haplotype in [0, 1]:
                 sample_name = f'{individual}_{haplotype}'
-                seq = mutations.concat_mutations(sample_name)
+                mutations.concat_mutations(sample_name)
 
-                file.write_header(sample_name)
-                file.write_sequence(seq)
+        file = aminos.io.fasta.Writer(args.output, transcript_id)
 
+        file.write(mutations)
         file.close()
 
         total_mutations += mutations.total_mutations
         accepted_mutations += mutations.accepted_mutations
 
-    logging.info(f"Accepted mutations total: {sum(accepted_mutations.values())} ({100 * sum(accepted_mutations.values())/total_mutations:.2f}% accepted)")
-    logging.info(f"Accepted mutations by type: {accepted_mutations}")
-    logging.info(f"Total transcripts seen: {total_transcripts_seen}")
+    #logging.info(f"Accepted mutations total: {sum(accepted_mutations.values())} ({100 * sum(accepted_mutations.values())/total_mutations:.2f}% accepted)")
+    #logging.info(f"Accepted mutations by type: {accepted_mutations}")
+    #logging.info(f"Total transcripts seen: {total_transcripts_seen}")
 
 # example:
 # python3 aminos.py --vcf data/ALL_GGVP.chr21.vcf.gz --gff data/Homo_sapiens.GRCh38.110.chromosome.21.gff3.gz --fasta data/reference_sequences.fasta.gz --output data/test
 
 if __name__ == "__main__":
-    main()
+    with cProfile.Profile() as pr:
+        main()
+
+    stats = pstats.Stats(pr)
+    stats.sort_stats(pstats.SortKey.CUMULATIVE)  # Sorting by time spent
+    stats.print_stats(50)
