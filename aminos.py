@@ -64,13 +64,14 @@ def main():
                             mutations.add_sample_mutation(f'{individual}_{haplotype}', mutation)
                             total_mutations_seen += 1
 
-        if mutations.accepted_mutations == 0:
-            continue
-
         for individual in vcf.samples:
             for haplotype in [0, 1]:
                 sample_name = f'{individual}_{haplotype}'
                 mutations.concat_mutations(sample_name)
+
+        if mutations.accepted_mutations == 0:
+            continue
+
 
         file = aminos.io.fasta.Writer(args.output, transcript_id)
 
