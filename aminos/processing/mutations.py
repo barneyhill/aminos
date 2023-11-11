@@ -63,7 +63,8 @@ class Mutations:
             # Append the sample to the list of associated samples
             self._mutation_ids_to_samples[mutation_ids].add(sample)
             self.accepted_mutations += len(mutation_ids)
-            return
+
+            return self._mutation_ids_to_sequence[mutation_ids]
 
         transcript_seq = list(self.transcript_reference)
         sample_mutations = self.get_sample_mutations(sample)
@@ -71,7 +72,7 @@ class Mutations:
         # Apply sorted mutations
         for mutation in sorted(sample_mutations, key=lambda mut: mut.ref_pos):
             if not self._is_valid_mutation(mutation, transcript_seq):
-                return
+                return self.transcript_reference
 
             # Apply the mutation
             for i, _ in enumerate(mutation.ref_seq):
@@ -84,6 +85,8 @@ class Mutations:
         self._mutation_ids_to_samples[mutation_ids].add(sample)
 
         self.accepted_mutations += len(mutation_ids)
+
+        return result_sequence
 
     def _is_valid_mutation(self, mutation, transcript_seq):
         for i, ref_char in enumerate(mutation.ref_seq):
