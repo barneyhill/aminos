@@ -101,9 +101,5 @@ class Mutations:
             if transcript_seq[pos] != ref_char:
                 logging.debug(f"Reference {mutation.ref_pos + i}{ref_char} does not match transcript reference {pos + 1}{transcript_seq[pos]}")
                 return False
-            
-            # Overlap check
-            if transcript_seq[pos] == '':
-                logging.debug(f"Conflict! Mutation at position {pos + 1} has already been touched!")
-                return False
+
         return True
