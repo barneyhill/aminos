@@ -1,21 +1,12 @@
 import argparse
 import logging
 import aminos
-from collections import Counter
 import tqdm
 
 import cProfile
 import pstats
 
-def main():
-    parser = argparse.ArgumentParser(description="aminos")
-    parser.add_argument('--vcf', help='Path to VCF file', required=True)
-    parser.add_argument('--gff', help='Path to GFF file', required=True)
-    parser.add_argument('--fasta', help='Path to FASTA file', required=True)
-    parser.add_argument('--output', help='Output directory', required=True)
-    parser.add_argument('--debug', help='Enable debug mode', action='store_true', default=False)
-
-    args = parser.parse_args()
+def run(args):
 
     # Configure logging
     if args.debug:
@@ -86,10 +77,28 @@ def main():
 # example:
 # python3 aminos.py --vcf data/ALL_GGVP.chr21.vcf.gz --gff data/Homo_sapiens.GRCh38.110.chromosome.21.gff3.gz --fasta data/reference_sequences.fasta.gz --output data/test
 
-if __name__ == "__main__":
-    with cProfile.Profile() as pr:
-        main()
+def main():
 
-    stats = pstats.Stats(pr)
-    stats.sort_stats(pstats.SortKey.CUMULATIVE)  # Sorting by time spent
-    stats.print_stats(50)
+    parser = argparse.ArgumentParser(description="aminos")
+    parser.add_argument('--vcf', help='Path to VCF file', required=True)
+    parser.add_argument('--gff', help='Path to GFF file', required=True)
+    parser.add_argument('--fasta', help='Path to FASTA file', required=True)
+    parser.add_argument('--output', help='Output directory', required=True)
+    parser.add_argument('--debug', help='Enable debug mode', action='store_true', default=False)
+    parser.add_argument('--cprofile', help='profile code and print summary', action='store_true')
+
+    args = parser.parse_args()
+
+    if args.cprofile:
+        with cProfile.Profile() as pr:
+            run(args)
+
+        stats = pstats.Stats(pr)
+        stats.sort_stats(pstats.SortKey.CUMULATIVE)  # Sorting by time spent
+        stats.print_stats(50)
+    else:
+        run(args)
+
+
+if __name__ == "__main__":
+    main()
