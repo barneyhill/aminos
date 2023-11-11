@@ -17,9 +17,6 @@ def main():
 
     args = parser.parse_args()
 
-    total_mutations = 0
-    accepted_mutations = Counter()
-
     # Configure logging
     if args.debug:
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -31,6 +28,8 @@ def main():
     transcript_references = aminos.io.fasta.read_transcript_references(args.fasta)
 
     gff_transcripts = gff.get_unique_transcripts()
+
+    # Counters for stats
     total_transcripts_seen = 0
     total_mutations_seen = 0
     accepted_mutations = 0
@@ -64,6 +63,9 @@ def main():
                         if individual_call[haplotype] == 1:
                             mutations.add_sample_mutation(f'{individual}_{haplotype}', mutation)
                             total_mutations_seen += 1
+
+        if mutations.accepted_mutations == 0:
+            continue
 
         for individual in vcf.samples:
             for haplotype in [0, 1]:
