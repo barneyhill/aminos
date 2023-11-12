@@ -62,9 +62,8 @@ def run(args):
                     mutations.add_sample_mutation(mutated_sample, mutation_id)
                     total_mutations_seen += 1
 
-        for individual in vcf.samples:
-            for haplotype in [0, 1]:
-                mutations.concat_mutations(sample=f"{individual}_{haplotype}")
+        for sample in samples:
+            mutations.concat_mutations(sample)
 
         if mutations.accepted_mutations == 0:
             continue
