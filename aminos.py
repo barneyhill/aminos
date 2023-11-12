@@ -36,6 +36,9 @@ def run(args):
         mutations = aminos.processing.mutations.Mutations(transcript_reference)
         chr, start, end = gff.get_transcript_range(transcript_id)
 
+        if args.set_chr:
+            chr = args.set_chr
+
         logging.debug(f"Processing transcript: {transcript_id} ({chr}:{start}-{end})")
 
         for record in vcf(f'{chr}:{start}-{end}'):
@@ -85,6 +88,7 @@ def main():
     parser.add_argument('--output', help='Output directory', required=True)
     parser.add_argument('--debug', help='Enable debug mode', action='store_true', default=False)
     parser.add_argument('--cprofile', help='profile code and print summary', action='store_true')
+    parser.add_argument('--set-chr', help='force a chr value', required=False)
 
     args = parser.parse_args()
 
