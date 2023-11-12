@@ -1,4 +1,4 @@
-from collections import defaultdict, Counter
+from collections import defaultdict
 from dataclasses import dataclass
 import logging
 
@@ -56,7 +56,7 @@ class Mutations:
         
     def concat_mutations(self, sample):
         # Generate a cache key (sorted tuple of mutation IDs)
-        mutation_ids = tuple(sorted(self.mutation_ids[sample]))
+        mutation_ids = frozenset(self.mutation_ids[sample])
 
         # Check if the result is already in the cache
         if mutation_ids in self._mutation_ids_to_sequence:
