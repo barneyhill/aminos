@@ -16,7 +16,7 @@ def run(args):
     else:
         logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-    vcf = aminos.io.VCF(args.vcf)
+    vcf = aminos.io.VCF(args.vcf, args.n_threads)
     gff = aminos.io.GFF(args.gff)
     transcript_references = aminos.io.fasta.read_transcript_references(args.fasta)
 
@@ -91,7 +91,7 @@ def main():
     parser.add_argument('--debug', help='Enable debug mode', action='store_true', default=False)
     parser.add_argument('--cprofile', help='profile code and print summary', action='store_true')
     parser.add_argument('--set-chr', help='force a chr value', required=False)
-    parser.add_argument('--threads', help='Number of threads to use for VCF reader', default=os.cpu_count())
+    parser.add_argument('--threads', help='Number of threads to use for VCF reader', default=os.cpu_count(), type=int)
 
     args = parser.parse_args()
 
