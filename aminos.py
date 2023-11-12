@@ -59,13 +59,12 @@ def run(args):
                 for individual_call, individual in zip(record.genotypes, vcf.samples):
                     for haplotype in [0, 1]:
                         if individual_call[haplotype] == 1:
-                            mutations.add_sample_mutation(f'{individual}_{haplotype}', mutation_id)
+                            mutations.add_sample_mutation((individual, haplotype), mutation_id)
                             total_mutations_seen += 1
 
         for individual in vcf.samples:
             for haplotype in [0, 1]:
-                sample_name = f'{individual}_{haplotype}'
-                mutations.concat_mutations(sample_name)
+                mutations.concat_mutations(sample=(individual, haplotype))
 
         if mutations.accepted_mutations == 0:
             continue
