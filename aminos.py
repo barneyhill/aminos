@@ -16,7 +16,7 @@ def run(args):
     else:
         logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-    vcf = aminos.io.VCF(args.vcf, args.n_threads)
+    vcf = aminos.io.VCF(args.vcf, args.threads)
     gff = aminos.io.GFF(args.gff)
     transcript_references = aminos.io.fasta.read_transcript_references(args.fasta)
 
