@@ -54,10 +54,12 @@ def run(args):
                 if not mutation:
                     continue
 
+                mutation_id = mutations.get_mutation_id(mutation)
+
                 for individual_call, individual in zip(record.genotypes, vcf.samples):
                     for haplotype in [0, 1]:
                         if individual_call[haplotype] == 1:
-                            mutations.add_sample_mutation(f'{individual}_{haplotype}', mutation)
+                            mutations.add_sample_mutation(f'{individual}_{haplotype}', mutation_id)
                             total_mutations_seen += 1
 
         for individual in vcf.samples:

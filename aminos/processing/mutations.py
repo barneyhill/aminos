@@ -33,7 +33,7 @@ class Mutations:
     def get_mutation_ids_to_samples(self):
         return self._mutation_ids_to_samples
 
-    def _get_mutation_id(self, mutation):
+    def get_mutation_id(self, mutation):
         mutation_key = str(mutation)
         if mutation_key not in self._mutation_to_id:
             self._mutation_to_id[mutation_key] = self._mutation_id_counter
@@ -47,8 +47,7 @@ class Mutations:
     def _get_mutation_to_id(self, mutation):
         return self._mutation_to_id.get(mutation, None)
     
-    def add_sample_mutation(self, sample, mutation):
-        mutation_id = self._get_mutation_id(mutation)
+    def add_sample_mutation(self, sample, mutation_id):
         self.mutation_ids[sample].add(mutation_id)
 
     def get_sample_mutations(self, sample):
