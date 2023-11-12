@@ -1,7 +1,9 @@
 import argparse
 import logging
-import aminos
 import tqdm
+import os
+
+import aminos
 
 import cProfile
 import pstats
@@ -89,6 +91,7 @@ def main():
     parser.add_argument('--debug', help='Enable debug mode', action='store_true', default=False)
     parser.add_argument('--cprofile', help='profile code and print summary', action='store_true')
     parser.add_argument('--set-chr', help='force a chr value', required=False)
+    parser.add_arguement('--threads', help='Number of threads to use for VCF reader', default=os.cpu_count())
 
     args = parser.parse_args()
 
