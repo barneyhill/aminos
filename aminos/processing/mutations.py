@@ -70,7 +70,7 @@ class Mutations:
         sample_mutations = self.get_sample_mutations(sample)
 
         # Apply sorted mutations
-        for mutation in sorted(sample_mutations, key=lambda mut: mut.ref_pos):
+        for mutation in sample_mutations:
             if not self._is_valid_mutation(mutation, transcript_seq):
                 return self.transcript_reference
 
