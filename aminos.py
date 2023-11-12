@@ -19,7 +19,7 @@ def run(args):
 
     vcf = aminos.io.VCF(args.vcf, args.threads)
     gff = aminos.io.GFF(args.gff)
-    transcript_references = aminos.io.fasta.read_transcript_references(args.fasta)
+    transcript_references = aminos.io.fasta.read_transcript_references(args.fasta, args.threads)
 
     gff_transcripts = gff.get_unique_transcripts()
 
@@ -68,7 +68,7 @@ def run(args):
         if mutations.accepted_mutations == 0:
             continue
 
-        file = aminos.io.fasta.Writer(args.output, transcript_id)
+        file = aminos.io.fasta.Writer(args.output, transcript_id, args.threads)
 
         file.write(mutations)
         file.close()

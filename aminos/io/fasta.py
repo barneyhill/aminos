@@ -1,12 +1,12 @@
-import gzip
+import pgzip
 import os
 import logging
 
-def read_transcript_references(file_path):
+def read_transcript_references(file_path, threads):
     logging.debug(f"Reading transcript references from: {file_path}")
     transcript_reference = {}
     try:
-        with gzip.open(file_path, 'rt') as file:  # 'rt' mode to read as text
+        with pgzip.open(file_path, 'rt', thread=threads) as file:  # 'rt' mode to read as text
             name = None
             seq_list = []
             for line in file:
@@ -29,10 +29,10 @@ def read_transcript_references(file_path):
 
 class Writer:
 
-    def __init__(self, file_dir, transcript):
+    def __init__(self, file_dir, transcript, threads=1):
         self.file_path = os.path.join(file_dir, f'{transcript}.fa.gz')
         try:
-            self.file = gzip.open(self.file_path, 'w', compresslevel=6)
+            self.file = pgzip.open(self.file_path, 'w', compresslevel=5, thread=threads)
             logging.debug(f"Initialized Writer for file: {self.file_path}")
         except Exception as e:
             logging.error(f"Error opening file for writing: {e}")
