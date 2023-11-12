@@ -2,6 +2,7 @@ import argparse
 import logging
 import tqdm
 import os
+import numpy as np
 
 import aminos
 
@@ -26,6 +27,8 @@ def run(args):
     total_transcripts_seen = 0
     total_mutations_seen = 0
     accepted_mutations = 0
+
+    samples = np.array([f"{individual}_{haplotype}" for individual in vcf.samples for haplotype in [0, 1]])
 
     for transcript_id in tqdm.tqdm(gff_transcripts, desc="Iterating over transcripts"):
         
@@ -55,16 +58,13 @@ def run(args):
                     continue
 
                 mutation_id = mutations.get_mutation_id(mutation)
-
-                for individual_call, individual in zip(record.genotypes, vcf.samples):
-                    for haplotype in [0, 1]:
-                        if individual_call[haplotype] == 1:
-                            mutations.add_sample_mutation((individual, haplotype), mutation_id)
-                            total_mutations_seen += 1
+                for mutated_sample in samples[(record.genotype.array()[:,0:2] == 1).flatten()]:
+                    mutations.add_sample_mutation(mutated_sample, mutation_id)
+                    total_mutations_seen += 1
 
         for individual in vcf.samples:
             for haplotype in [0, 1]:
-                mutations.concat_mutations(sample=(individual, haplotype))
+                mutations.concat_mutations(sample=f"{individual}_{haplotype}")
 
         if mutations.accepted_mutations == 0:
             continue

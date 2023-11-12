@@ -57,7 +57,7 @@ class Writer:
         ids_to_sequence = mutations_store.get_mutation_ids_to_sequence()
 
         for mutations, samples in mutations_store.get_mutation_ids_to_samples().items():
-            self.write_header(','.join(f'{individual}_{haplotype}' for individual, haplotype in samples))
+            self.write_header(','.join(samples))
             self.write_sequence(ids_to_sequence[mutations])
         self.flush_buffer()
 
