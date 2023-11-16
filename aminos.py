@@ -33,6 +33,7 @@ def run(args):
     samples = np.array([f"{individual}_{haplotype}" for individual in vcf.samples for haplotype in [0, 1]])
 
     for transcript_id in tqdm(gff_transcripts, desc="Iterating over transcripts"):
+        logging.debug(f"Processing transcript: {transcript_id}")
         
         if transcript_id not in transcript_references:
             continue
@@ -46,7 +47,7 @@ def run(args):
         if args.set_chr:
             chr = args.set_chr
 
-        logging.debug(f"Processing transcript: {transcript_id} ({chr}:{start}-{end})")
+        logging.debug(f"Searching... {transcript_id} ({chr}:{start}-{end})")
 
         for record in vcf(f'{chr}:{start}-{end}'):
             bcsq = record.INFO.get('BCSQ')

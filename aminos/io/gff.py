@@ -23,6 +23,9 @@ class GFF:
             gff['ID'] = gff['attributes'].str.extract(r'ID=([^;]+)')
             gff = gff[gff['ID'].notna()]
 
+            # throwaway version info
+            gff['ID'] = gff['ID'].str.extract(r'([^\.]+)\.')
+
             logging.info(f"Successfully read and processed {file}")
             return gff
         except Exception as e:

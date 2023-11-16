@@ -10,7 +10,7 @@ def read_transcript_references(file_path, threads):
             name = None
             protein_coding = False
             seq_list = []
-            
+
             for line in file:
                 line = line.strip()  # Remove trailing newline characters
                 if line.startswith(">"):
@@ -19,6 +19,10 @@ def read_transcript_references(file_path, threads):
                         seq_list = []
                     info = line[1:].split('|')  # Get the name, discard the ">"
                     name = info[0]
+
+                    #throwaway version info
+                    name = name.split('.')[0]
+                    
                     protein_coding = info[-2] == 'protein_coding'
                 else:
                     seq_list.append(line)
