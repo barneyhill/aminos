@@ -1,6 +1,7 @@
 import argparse
 import logging
-import tqdm
+from tqdm_loggable.auto import tqdm
+
 import os
 import numpy as np
 import sys
