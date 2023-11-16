@@ -2,12 +2,12 @@ import pandas as pd
 import logging
 
 class GFF:
-    def __init__(self, file):
+    def __init__(self, file, chrom):
         logging.debug(f"Initializing GFF with file: {file}")
-        self.gff = self.read_gff(file)
+        self.gff = self.read_gff(file, chrom)
 
     @staticmethod
-    def read_gff(file):
+    def read_gff(file, chrom):
         logging.debug(f"Reading GFF file: {file}")
         field_names = [
             'seqid', 'source', 'type', 'start', 'end', 'score', 
@@ -15,8 +15,14 @@ class GFF:
         ]
         try:
             gff = pd.read_csv(file, sep='\t', comment='#', names=field_names)
-            gff['ID'] = gff['attributes'].str.extract(r'ID=transcript:([^;]+)')
+
+            gff = gff[gff['seqid'] == chrom]
+
+            # filter to transcripts
+            gff = gff[gff['type'] == 'transcript']
+            gff['ID'] = gff['attributes'].str.extract(r'ID=([^;]+)')
             gff = gff[gff['ID'].notna()]
+
             logging.info(f"Successfully read and processed {file}")
             return gff
         except Exception as e:
