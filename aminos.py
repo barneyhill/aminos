@@ -3,6 +3,7 @@ import logging
 import tqdm
 import os
 import numpy as np
+import sys
 
 import aminos
 
@@ -30,7 +31,7 @@ def run(args):
 
     samples = np.array([f"{individual}_{haplotype}" for individual in vcf.samples for haplotype in [0, 1]])
 
-    for transcript_id in tqdm.tqdm(gff_transcripts, desc="Iterating over transcripts"):
+    for transcript_id in tqdm.tqdm(gff_transcripts, desc="Iterating over transcripts", file=sys.stdout):
         
         if transcript_id not in transcript_references:
             continue
