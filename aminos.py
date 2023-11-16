@@ -32,7 +32,7 @@ def run(args):
 
     samples = np.array([f"{individual}_{haplotype}" for individual in vcf.samples for haplotype in [0, 1]])
 
-    for transcript_id in tqdm.tqdm(gff_transcripts, desc="Iterating over transcripts"):
+    for transcript_id in tqdm(gff_transcripts, desc="Iterating over transcripts"):
         
         if transcript_id not in transcript_references:
             continue
