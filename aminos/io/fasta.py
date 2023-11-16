@@ -8,22 +8,25 @@ def read_transcript_references(file_path, threads):
     try:
         with pgzip.open(file_path, 'rt', thread=threads) as file:  # 'rt' mode to read as text
             name = None
-            protein_coding = False
             seq_list = []
 
             for line in file:
                 line = line.strip()  # Remove trailing newline characters
+
                 if line.startswith(">"):
-                    if name and protein_coding:
+                    if name:
                         transcript_reference[name] = ''.join(seq_list)
                         seq_list = []
+
                     info = line[1:].split('|')  # Get the name, discard the ">"
                     name = info[0]
 
-                    #throwaway version info
+                    #example: transcript:ENST00000621433.1
+                    name = name.split(' ')[4]
                     name = name.split('.')[0]
-                    
-                    protein_coding = info[-2] == 'protein_coding'
+                    # remove transcript:
+                    name = name.split(':')[1]
+
                 else:
                     seq_list.append(line)
             if name:  # Save the last sequence

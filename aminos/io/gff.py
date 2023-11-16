@@ -16,15 +16,11 @@ class GFF:
         try:
             gff = pd.read_csv(file, sep='\t', comment='#', names=field_names)
 
-            gff = gff[gff['seqid'] == chrom]
+            gff = gff[gff['seqid'].astype(str) == chrom.replace('chr', '')]
 
             # filter to transcripts
-            gff = gff[gff['type'] == 'transcript']
-            gff['ID'] = gff['attributes'].str.extract(r'ID=([^;]+)')
+            gff['ID'] = gff['attributes'].str.extract(r'ID=transcript:([^;]+)')
             gff = gff[gff['ID'].notna()]
-
-            # throwaway version info
-            gff['ID'] = gff['ID'].str.extract(r'([^\.]+)\.')
 
             logging.info(f"Successfully read and processed {file}")
             return gff
