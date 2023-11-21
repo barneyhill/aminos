@@ -42,7 +42,7 @@ def parse_amino_acid_field(input_string):
 # an instruction is defined as:
 # (mutation_code, ref_pos, ref_seq, mut_pos, mut_seq)
 
-def process_csq(transcript_id, csq):
+def process_csq(transcript_id, csq, valid_mutation_types=['missense', 'inframe_insertion', 'inframe_deletion']):
     csq = csq.split('|')
 
     if len(csq) != 7:
@@ -53,7 +53,7 @@ def process_csq(transcript_id, csq):
 
     mutation_type = csq[0]
 
-    if mutation_type not in mutation_dict:
+    if mutation_type not in valid_mutation_types:
         return None
 
     mutation_code = mutation_dict[mutation_type]

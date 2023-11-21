@@ -30,6 +30,11 @@ def run(args):
     total_mutations_seen = 0
     accepted_mutations = 0
 
+    if args.missense_only:
+        valid_mutation_types = ['missense']
+    else:
+        valid_mutation_types = ['missense', 'inframe_insertion', 'inframe_deletion']
+
     samples = np.array([f"{individual}_{haplotype}" for individual in vcf.samples for haplotype in [0, 1]])
 
     for transcript_id in tqdm(gff_transcripts, desc="Iterating over transcripts"):
@@ -55,7 +60,7 @@ def run(args):
                 continue
 
             for csq in bcsq.split(','):
-                mutation = aminos.processing.csq.process_csq(transcript_id, csq)
+                mutation = aminos.processing.csq.process_csq(transcript_id, csq, valid_mutation_types)
 
                 if not mutation:
                     continue
@@ -95,6 +100,7 @@ def main():
     parser.add_argument('--cprofile', help='profile code and print summary', action='store_true')
     parser.add_argument('--set-chr', help='force a chr value', required=False)
     parser.add_argument('--threads', help='Number of threads to use for VCF reader', default=os.cpu_count(), type=int)
+    parser.add_argument('--missense-only', help='Only process missense mutations (no indels)', action='store_true', default=False)
 
     args = parser.parse_args()
 
