@@ -34,3 +34,10 @@ class TestConcatMutations(unittest.TestCase):
         self.mutations.add_sample_mutation("sample5", mut_id)
         # Expecting warning and unchanged sequence due to out-of-bounds
         self.assertEqual(self.mutations.concat_mutations("sample5"), self.transcript_reference)
+
+    def test_out_of_bounds(self):
+        mut_id = self.mutations.get_mutation_id(Mutation("M", 13, "T", 13, "GG"))
+
+        self.mutations.add_sample_mutation("sample5", mut_id)
+        # Expecting warning and unchanged sequence due to out-of-bounds
+        self.assertEqual(self.mutations.concat_mutations("sample5"), self.transcript_reference)

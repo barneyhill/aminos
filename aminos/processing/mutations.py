@@ -88,6 +88,9 @@ class Mutations:
         return result_sequence
 
     def _is_valid_mutation(self, mutation, transcript_seq):
+
+        # Valid AA check:
+
         for i, ref_char in enumerate(mutation.ref_seq):
             pos = mutation.ref_pos - 1 + i
 
@@ -100,5 +103,10 @@ class Mutations:
             if transcript_seq[pos] != ref_char:
                 logging.debug(f"Reference {mutation.ref_pos + i}{ref_char} does not match transcript reference {pos + 1}{transcript_seq[pos]}")
                 return False
+            
+            if ref_char not in 'ARNDCQEGHILKMFPSTWYV':
+                logging.debug(f"Invalid amino acid {mutation.alt_seq}")
+                return False
+
 
         return True
