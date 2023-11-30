@@ -71,15 +71,15 @@ class Mutations:
         # Apply sorted mutations
         for mutation in sample_mutations:
             if not self._is_valid_mutation(mutation, transcript_seq):
-                return self.transcript_reference
+                return ','.join(list(self.transcript_reference))
 
-            # Apply the mutation
             for i, _ in enumerate(mutation.ref_seq):
                 transcript_seq[mutation.ref_pos - 1 + i] = ''  # Remove ref_seq characters
-            transcript_seq[mutation.ref_pos - 1] = mutation.alt_seq  # Insert alt_seq
+
+            transcript_seq[mutation.alt_pos - 1] = mutation.alt_seq  # Insert alt_seq
 
         # Concatenate the sequence and update the cache
-        result_sequence = ''.join(transcript_seq)
+        result_sequence = ','.join(transcript_seq)
         self._mutation_ids_to_sequence[mutation_ids] = result_sequence
         self._mutation_ids_to_samples[mutation_ids].add(sample)
 
@@ -91,7 +91,7 @@ class Mutations:
 
         # Valid AA check:
 
-        for i, ref_char in enumerate(mutation.ref_seq):
+        for i, ref_aa in enumerate(mutation.ref_seq):
             pos = mutation.ref_pos - 1 + i
 
             # Out-of-bounds check:
@@ -100,13 +100,26 @@ class Mutations:
                 return False
 
             # Mismatch check:
-            if transcript_seq[pos] != ref_char:
-                logging.debug(f"Reference {mutation.ref_pos + i}{ref_char} does not match transcript reference {pos + 1}{transcript_seq[pos]}")
+            if transcript_seq[pos] != ref_aa:
+                logging.debug(f"Reference {mutation.ref_pos + i}{ref_aa} does not match transcript reference {pos + 1}{transcript_seq[pos]}")
                 return False
             
-            if ref_char not in 'ARNDCQEGHILKMFPSTWYV':
+            if ref_aa not in 'ARNDCQEGHILKMFPSTWYV':
                 logging.debug(f"Invalid amino acid {mutation.alt_seq}")
                 return False
+            
+        for i, alt_aa in enumerate(mutation.alt_seq):
+            pos = mutation.alt_pos - 1 + i
+
+            # Out-of-bounds check:
+            if pos >= len(transcript_seq):
+                logging.debug(f"Mutation at position {pos + 1} is out of bounds!")
+                return False
+
+            if alt_aa not in 'ARNDCQEGHILKMFPSTWYV':
+                logging.debug(f"Invalid amino acid {mutation.alt_seq}")
+                return False
+
 
 
         return True
