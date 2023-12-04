@@ -92,7 +92,7 @@ class Mutations:
         # Valid AA check:
 
         for i, ref_aa in enumerate(mutation.ref_seq):
-            pos = mutation.ref_pos - 1 + i
+            pos = mutation.ref_pos + i
 
             # Out-of-bounds check:
             if pos >= len(transcript_seq):
