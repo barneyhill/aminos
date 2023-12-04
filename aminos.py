@@ -46,6 +46,9 @@ def run(args):
             transcript_reference = transcript_references[transcript_id]
             total_transcripts_seen += 1
 
+            if args.first_n and total_transcripts_seen > args.first_n:
+                break
+
         mutations = aminos.processing.mutations.Mutations(transcript_reference)
         chr, start, end = gff.get_transcript_range(transcript_id)
 
@@ -101,6 +104,7 @@ def main():
     parser.add_argument('--set-chr', help='force a chr value', required=False)
     parser.add_argument('--threads', help='Number of threads to use for VCF reader', default=os.cpu_count(), type=int)
     parser.add_argument('--missense-only', help='Only process missense mutations (no indels)', action='store_true', default=False)
+    parser.add_argument('--first-n', help='Only process the first N transcripts', type=int, default=None)
 
     args = parser.parse_args()
 
