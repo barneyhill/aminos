@@ -101,7 +101,7 @@ class Mutations:
 
             # Mismatch check:
             if transcript_seq[pos] != ref_aa:
-                logging.debug(f"Reference {mutation.ref_pos + i}{ref_aa} does not match transcript reference {pos + 1}{transcript_seq[pos]}")
+                logging.debug(f"Reference {mutation.ref_pos + i}{ref_aa} does not match transcript reference {pos + 1}{transcript_seq[pos]}\nref:{transcript_seq}")
                 return False
             
             if ref_aa not in 'ARNDCQEGHILKMFPSTWYV':
@@ -119,7 +119,5 @@ class Mutations:
             if alt_aa not in 'ARNDCQEGHILKMFPSTWYV':
                 logging.debug(f"Invalid amino acid {mutation.alt_seq}")
                 return False
-
-
 
         return True
