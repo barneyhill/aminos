@@ -45,6 +45,9 @@ def run(args):
         
         if transcript_id not in transcript_references:
             continue
+        # check if the transcript has an unknown start codon (TODO: understand why this happens - 9677 occurances in ensembl - mentioned here: https://github.com/samtools/bcftools/issues/1553):
+        elif transcript_references[transcript_id][0] == 'X':
+            continue
         else:
             transcript_reference = transcript_references[transcript_id]
             total_transcripts_seen += 1
