@@ -37,8 +37,11 @@ def run(args):
 
     samples = np.array([f"{individual}_{haplotype}" for individual in vcf.samples for haplotype in [0, 1]])
 
-    for transcript_id in tqdm(gff_transcripts, desc="Iterating over transcripts"):
+    pbar = tqdm(gff_transcripts)
+
+    for transcript_id in pbar:
         logging.debug(f"Processing transcript: {transcript_id}")
+        pbar.set_description(f"{100 * accepted_mutations/(total_mutations_seen+1):.2f}% accepted")
         
         if transcript_id not in transcript_references:
             continue
