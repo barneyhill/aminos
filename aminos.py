@@ -41,11 +41,11 @@ def run(args):
 
     for transcript_id in pbar:
         logging.debug(f"Processing transcript: {transcript_id}")
-        pbar.set_description(f"{100 * accepted_mutations/(total_mutations_seen+1):.2f}% accepted")
+        pbar.set_description(f"{accepted_mutations} accepted, {total_mutations_seen} total")
         
         if transcript_id not in transcript_references:
             continue
-        # check if the transcript has an unknown start codon (TODO: understand why this happens - 9677 occurances in ensembl - mentioned here: https://github.com/samtools/bcftools/issues/1553):
+        # check if the transcript has an unknown start codon (TODO: understand why this happens - 9677 occurances in ensembl105 - mentioned here: https://github.com/samtools/bcftools/issues/1553):
         elif transcript_references[transcript_id][0] == 'X':
             continue
         else:
@@ -62,6 +62,7 @@ def run(args):
             chr = args.set_chr
 
         logging.debug(f"Searching... {transcript_id} ({chr}:{start}-{end})")
+        logging.debug(f"{transcript_id} reference: {transcript_reference}")
 
         for record in vcf(f'{chr}:{start}-{end}'):
             bcsq = record.INFO.get('BCSQ')
@@ -83,6 +84,7 @@ def run(args):
             mutations.concat_mutations(sample)
 
         if mutations.accepted_mutations == 0:
+            logging.debug(f"No accepted mutations for transcript: {transcript_id}")
             continue
 
         file = aminos.io.fasta.Writer(args.output, transcript_id, args.threads)
