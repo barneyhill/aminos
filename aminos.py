@@ -65,18 +65,26 @@ def run(args):
         logging.debug(f"{transcript_id} reference: {transcript_reference}")
 
         for record in vcf(f'{chr}:{start}-{end}'):
-            bcsq = record.INFO.get('BCSQ')
-            if bcsq is None:
+            bcsq_info = record.INFO.get('BCSQ')
+            bcsq_format = record.format('BCSQ', "Integer")
+
+            if bcsq_info is None or bcsq_format is None:
                 continue
 
-            for csq in bcsq.split(','):
+            for csq_i, csq in enumerate(bcsq_info.split(',')):
                 mutation = aminos.processing.csq.process_csq(transcript_id, csq, valid_mutation_types)
 
                 if not mutation:
                     continue
 
+                if csq_i > 15:
+                    break
+                    raise Exception(f"Too many CSQs detected, expected 15 or less with default --ncsq 15. To increase this we would need to support int64 in cyvcf2... (TODO!)")
+
+                haplotype1_csqs, haplotype2_csqs = aminos.io.vcf.get_haplotypes_at_index(bcsq_format, csq_i)
+
                 mutation_id = mutations.get_mutation_id(mutation)
-                for mutated_sample in samples[(record.genotype.array()[:,0:2] == 1).flatten()]:
+                for mutated_sample in samples[aminos.io.vcf.interleave_arrays(haplotype1_csqs, haplotype2_csqs)]:
                     mutations.add_sample_mutation(mutated_sample, mutation_id)
                     total_mutations_seen += 1
 
