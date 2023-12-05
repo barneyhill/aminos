@@ -1,13 +1,14 @@
 import cyvcf2
 import logging
 import numpy as np
+from typing import Tuple
 
 def interleave_arrays(haplo1_set: np.ndarray, haplo2_set: np.ndarray) -> np.ndarray:
     # Stack arrays depth-wise and then flatten
     interleaved = np.dstack((haplo1_set, haplo2_set)).flatten()
     return interleaved
 
-def get_haplotypes_at_index(bitmask_array: np.ndarray, index: int) -> tuple[np.ndarray, np.ndarray]:
+def get_haplotypes_at_index(bitmask_array: np.ndarray, index: int) -> Tuple[np.ndarray, np.ndarray]:
     """
     Returns haplotype presence information for a given index across a NumPy array of bitmasks.
 
