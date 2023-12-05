@@ -71,6 +71,7 @@ class Mutations:
         # Apply sorted mutations
         for mutation in sample_mutations:
             if not self._is_valid_mutation(mutation, transcript_seq):
+                logging.debug(f"Invalid mutations: {sample_mutations}")
                 return ','.join(list(self.transcript_reference))
 
             for i, _ in enumerate(mutation.ref_seq):
